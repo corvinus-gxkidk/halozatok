@@ -18,6 +18,7 @@ div {
 
 #kérdés_szöveg {
     background-color: crimson;
+    color:white;
 }
 
 #középső {
@@ -60,3 +61,4 @@ div {
         margin: auto;
         max-width: 1500px;
     }
+}
