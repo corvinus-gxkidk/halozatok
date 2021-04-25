@@ -1,43 +1,63 @@
-﻿window.onload = letöltés()
+﻿window.onload = function () {
+    kérdésBetöltés(jelenlegiKérdés);
+    kérdések();
+}
 
 var kérdés;
-var jelenlegiKérdés = 0;
+var jelenlegiKérdés = 1;
+var összkérdésszám;
 
-function letöltés() {
-    fetch('/questions.json')
+
+
+function kérdésBetöltés(id) {
+    fetch(`/questions/${id}`)
+        .then(response => {
+            if (!response.ok) {
+                console.error(`Hibás válasz: ${response.status}`)
+            }
+            else {
+                return response.json()
+            }
+        })
+        .then(data => kérdésMegjelenítés(data));
+}  
+
+
+function kérdések() {
+    fetch('/questions/all')
         .then(response => response.json())
-        .then(data => letöltésBefejeződött(data)
-        );
+        .then(data => összkérdés(data)
+);}
+
+function összkérdés(data) {
+    összkérdésszám = Object.keys(data).length
 }
 
-function letöltésBefejeződött(d) {
-    console.log("Sikeres letöltés")
-    console.log(d)
-    kérdés = d;
-    kérdésMegjelenítés(0);
-}
-
-function kérdésMegjelenítés(k) {
-    let ide_kérdés = document.getElementById("kérdés_szöveg");
-    ide_kérdés.innerHTML = kérdés[k].questionText;
-    console.log(`$"{kérdés.length} kérdés érkezett"`);
-
-    for (var i = 1; i < 4; i++) {
-
-        let elem_kérdés = document.getElementById("válasz" + i)
-        elem_kérdés.innerText = kérdés[k]["answer" + i]
-        //ide_kérdés.appendChild(elem_kérdés)
+function kérdésMegjelenítés(kérdés) {
+    console.log(kérdés);
+    document.getElementById("kérdés_szöveg").innerText = kérdés.questionText
+    document.getElementById("válasz1").innerText = kérdés.answer1
+    document.getElementById("válasz2").innerText = kérdés.answer2
+    document.getElementById("válasz3").innerText = kérdés.answer3
+    if (kérdés.image != "") {
+        document.getElementById("kép1").src = "https://szoft1.comeback.hu/hajo/" + kérdés.image;
     }
-
-    document.getElementById("kép1").src = "https://szoft1.comeback.hu/hajo/" + kérdés[k].image
-}
-
-function kattintottelőre() {
-    jelenlegiKérdés++;
+    else {
+        document.getElementById("kép1").src = "";
+    }
     
-    if (jelenlegiKérdés >= kérdés.length) {
-        jelenlegiKérdés = 0;
+}
+
+
+
+function kattintottelőre() { 
+    if (jelenlegiKérdés == összkérdésszám) {
+        jelenlegiKérdés = 1;
     }
+    else {
+        jelenlegiKérdés++;
+    }
+    kérdésBetöltés(jelenlegiKérdés)
     document.getElementById("válasz1").style.backgroundColor = "powderblue";
     document.getElementById("válasz2").style.backgroundColor = "powderblue";
     document.getElementById("válasz3").style.backgroundColor = "powderblue";
@@ -48,8 +68,9 @@ function kattintottelőre() {
 function kattintottvissza() {
     jelenlegiKérdés--;
     if (jelenlegiKérdés == -1) {
-        jelenlegiKérdés = kérdés.length-1;
+        jelenlegiKérdés = összkérdésszám;
     }
+    kérdésBetöltés(jelenlegiKérdés)
     document.getElementById("válasz1").style.backgroundColor = "powderblue";
     document.getElementById("válasz2").style.backgroundColor = "powderblue";
     document.getElementById("válasz3").style.backgroundColor = "powderblue";
